@@ -173,6 +173,7 @@ function newGame() {
 	place = 0;
 	running = true;
 	
+	id("newBtn").blur();
 	id("newBtn").disabled = true;
 	setText("info", " ");
 	setText("cpu", "0");
@@ -187,6 +188,8 @@ function newGame() {
   
 function takeCard() {
 	
+   id("takeBtn").blur();
+   
    if (running) {
        if (sum_usr <= 21 && sum_cpu <= 21 ) {
            randNum =  randomNumber( 0, 51);
@@ -221,7 +224,10 @@ function cpuTakeCard() {
  	// computer      
      var wait = 0;
  	place = 5;
+ 
+     id("standBtn").blur();
      disableButtons();
+     
      for (i = 0; i < 5; i++) {
      	if ( sum_usr > sum_cpu  &&  sum_cpu < 19 ) {
      	    wait += 700;
