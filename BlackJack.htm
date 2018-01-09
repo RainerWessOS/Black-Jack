@@ -23,17 +23,17 @@ body {
    text-align: center; 
    color: red; 
    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
-   margin:  20px auto 20px auto; 
+   margin:  20px auto 30px auto; 
 }
 
 .table1 { 
-   margin: 10px auto 50px auto; 
+   margin: 10px auto 40px auto; 
    height: 80px; 
    padding: 10px; 
 }
 
 .table2 { 
-  margin: 10px auto 20px auto; 
+  margin: 10px auto 30px auto; 
   height: 80px; 
   padding: 10px; 
 }
@@ -104,13 +104,24 @@ p {
 
 <script>
 	
-var points_usr = 0;
-var points_cpu = 0;
-var sum_usr = 0;
-var sum_cpu = 0;
-var randNum = 0;
-var place = 0;
-var running = false;
+/*
+*  Black Jack - (17+4) 
+*  Copyright  Rainer Wess 2018
+*  Open Source / Freeware
+*  Released under GNU GPL 3.0
+*/
+
+var points_usr;
+var points_cpu;
+var sum_usr;
+var sum_cpu;
+var place_usr;
+var place_cpu;
+var randNum;
+var running;
+var first_card;
+var ani = false;
+var intA;
 var i;
 var card = [];
 
@@ -144,6 +155,28 @@ function randomNumber(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function enableButtons() {
+	id("takeBtn").disabled = false;
+    id("standBtn").disabled = false;
+    id("newBtn").disabled = false;
+}
+
+function disableButtons() {
+	 id("takeBtn").disabled = true;
+     id("standBtn").disabled = true;
+}
+
+function setColor(sid, scolor) {
+	id(sid).style.color = scolor;
+}
+
+function aniWin() {
+	ani = (ani) ? false : true;
+	if (ani) setColor("info", "darkgreen");
+    else setColor("info", "gold");
+}
+
+
 function init() {
 
     points_usr = 0;
@@ -153,28 +186,19 @@ function init() {
     newGame();
 }
 
-function enableButtons() {
-	
-	id("takeBtn").disabled = false;
-    id("standBtn").disabled = false;
-    id("newBtn").disabled = false;
-}
-
-function disableButtons() {
-	
-	 id("takeBtn").disabled = true;
-     id("standBtn").disabled = true;
-}
-
 function newGame() {
 	
     sum_usr = 0;
     sum_cpu = 0;
-	place = 0;
+	place_usr = 0;
+	place_cpu = 5;
 	running = true;
-	
+	first_card = true;
 	id("newBtn").blur();
-	id("newBtn").disabled = true;
+	disableButtons();
+	
+	if (intA) clearInterval(intA);
+	ani = false;
 	setText("info", " ");
 	setText("cpu", "0");
     setText("you", "0");
@@ -182,77 +206,91 @@ function newGame() {
 	for (i = 0; i <= 9; i++) {
 	    id("place" + i).src = nocard.src;
     }
-    setTimeout(takeCard, 500);
-    setTimeout(enableButtons, 600);
- }
   
-function takeCard() {
+    setTimeout(showReversedCard, 500);
+    setTimeout(cpuTakeCard, 1000);
+    setTimeout(usrTakeCard, 1500);
+    setTimeout(enableButtons, 1600);
+ }
+ 
+ function showReversedCard() {
+     id("place6").src = revcard.src;
+ }
+
+function usrTakeCard() {
 	
    id("takeBtn").blur();
    
    if (running) {
-       if (sum_usr <= 21 && sum_cpu <= 21 ) {
+       if (sum_usr <= 21) {
            randNum =  randomNumber( 0, 51);
-           setImg(place, randNum);
-           if (place < 5) {  // Player
-               sum_usr += card_value[randNum % 13];
-               setText("you",  sum_usr);
-               if (sum_usr > 21) {
-        	       disableButtons();
-                   whoWins() ;
-               }
+           setImg(place_usr, randNum);
+           place_usr ++;
+           sum_usr += card_value[randNum % 13];
+           setText("you",  sum_usr);
+           if (sum_usr > 20) {
+        	   disableButtons();
+               whoWins() ;
            }
-           else {   // CPU
-               sum_cpu += card_value[randNum % 13];
-               setText("cpu",  sum_cpu);
-               if (sum_cpu > 21)  whoWins();
-           }
-           place ++;
        }
+       // sometimes five cards are not enough to come close to 21 
+      // ToDo: posibility to shift the drawn cards in the places, if more cards have to be drawn then places available
+       if (place_usr > 4 ) stand();
    }
 }
 
 function cpuTakeCard() {
-	
-	if (running && sum_usr > sum_cpu  &&  sum_cpu < 19  ) {
-	   takeCard();
-    }
-    else whoWins();
+   
+   if (running) {
+       if (  first_card || ( sum_cpu < 19 && sum_cpu < sum_usr ) ) {
+       	first_card = false;
+           randNum =  randomNumber( 0, 51);
+           setImg(place_cpu, randNum);
+           place_cpu ++;
+           sum_cpu += card_value[randNum % 13];
+           setText("cpu",  sum_cpu);
+       }     
+       // sometimes five cards are not enough to win or come close to 21
+       else if (place_cpu == 10) whoWins();
+       else whoWins();
+   }
 }
  
  function stand() {
  	// computer      
      var wait = 0;
- 	place = 5;
  
      id("standBtn").blur();
      disableButtons();
      
-     for (i = 0; i < 5; i++) {
+     for (i = 0; i < 4; i++) {
      	if ( sum_usr > sum_cpu  &&  sum_cpu < 19 ) {
-     	    wait += 700;
 	         setTimeout(cpuTakeCard, wait);
+	         wait += 1000;
 	     }
      }
-     setTimeout(whoWins, wait);
  }
  
  function whoWins() {
  	if (running) {
- 	  if (sum_usr > 21 || ( sum_cpu <= 21 && sum_cpu > sum_usr) ) {
+ 	  if (sum_usr > 21 || ( sum_cpu <= 21 && sum_cpu > sum_usr && sum_usr > 0) ) {
  	       running = false;
+            setColor("info", "white");
             setText("info", "You lose.");
             points_cpu += 1;
             setText("points_cpu", points_cpu);
        }
-       else if (sum_cpu > 21 || ( sum_usr <= 21 && sum_usr > sum_cpu) ) {
+       else if (sum_cpu > 21 || sum_usr == 21 || ( sum_usr <= 21 && sum_usr > sum_cpu) ) {
        	running = false;
+           setColor("info", "gold");
            setText("info", "You Win!");
+           intA = setInterval(aniWin, 700);
            points_usr += 1;
            setText("points_usr", points_usr);
        }
        else  if (sum_cpu > 0 && sum_usr == sum_cpu) {   
            running = false;
+           setColor("info", "white")
            setText("info", "It's a tie!");
        }
     }
@@ -268,8 +306,8 @@ function cpuTakeCard() {
 <div class="player">CPU : <span id="cpu">0</span> <span id="busted"> </span><span id="points_cpu"> 0</span></div>
 
 <div class="table1">
-	    <div id="div5" class="placeDiv"><img id="place5" src="cards/nocard.png"></div>
-    <div id="div6" class="placeDiv"><img id="place6" src="cards/nocard.png"></div>
+	    <div id="div6" class="placeDiv"><img id="place6" src="cards/nocard.png"></div>
+    <div id="div5" class="placeDiv"><img id="place5" src="cards/nocard.png"></div>
     <div id="div7" class="placeDiv"><img id="place7" src="cards/nocard.png"></div>
     <div id="div8" class="placeDiv"><img id="place8" src="cards/nocard.png"></div>
     <div id="div9" class="placeDiv"><img id="place9" src="cards/nocard.png"></div>
@@ -285,7 +323,7 @@ function cpuTakeCard() {
     <div id="div4" class="placeDiv"><img id="place4" src="cards/nocard.png"></div>
 </div>
 
-<button id="takeBtn" class="Btn" onclick="takeCard()">TAKE CARD</button>
+<button id="takeBtn" class="Btn" onclick="usrTakeCard()">TAKE CARD</button>
 <button id="standBtn" class="Btn"  onclick="stand()">STAND</button>
 <button id="newBtn" class="Btn"  onclick="newGame()">NEW GAME</button>
 
