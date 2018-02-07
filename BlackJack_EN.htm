@@ -1,59 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
    <meta charset="utf-8" />
    <title>Black Jack</title>
    <meta name="author" content="Rainer Wess" />
    <meta name="description" content="Black Jack Game made with JavaScript HTML5 and CSS" />
-   <meta name="keywords" content="Spiel,Kartenspiel,17+4,siebzehn und vier,game,card game,Black Jack,Touch,Handy App,mobile phone,open source,GPL, freeware,HTML,CSS,JavaScript" />
+   <meta name="keywords" content="game,card game,Black Jack,Touch,Handy App,mobile phone,open source,GPL, freeware, HTML,CSS,JavaScript" />
+    <meta name="HandheldFriendly" content="true" />
 
-   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=yes, minimal-ui" />
+  
+  
 <style>
 
 /* 
-   I have reduced the margins-height     
+   I have reduced the margin-height     
    of some elements to look nicer on    
    the Sololearn mobile App. To play 
    it standlone you may stretch it a 
    little bit in Y-direction.
+   
+   New:
+   Optimised the layout with flexbox.
 */
 
-body {
-   width: 360px;
-   margin: auto;
+
+  body {
+    width: 360px;
+    margin: auto;
+    color: white;
+    font-family: Arial;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: darkgreen;
+
+    /* disabling content selection */
+    -webkit-user-select:none;
+
+    -khtml-user-select:none;
+
+    -moz-user-select:none;
+
+    -ms-user-select:none;
+
+    user-select:none;
+
+  }
+
+  hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  a {
+    color: Gold;
+  }
+  
+  .game_page {
+    position: absolute;
+    overflow: hidden;
+    top: 0px;
+    left: 0px;
+    width: 320px;
+    margin: 20px;
+    color: white;
+    background-color: darkgreen;
+  }
+
+  .overlay_page {
+    z-index: 5;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 320px;
+    margin: 20px;
+    color: white;
+    background-color: darkgreen;
+  }
+  
+ .hidden_page {
+    z-index: 5;
+    display: none;
+  }
+
+  .game_title {
+    font: 32px Arial;
+    font-weight: bold;
+    color: red;
+    text-align: left;
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+  }
+
+  .MenuBtn {
+    font: 22px Arial;
+    font-weight: bold;
+    color: DeepSkyBlue;
+    font-weight: bold;
+    float: right;
+    width: 35px;
+    height: 35px;
+    border: 1px solid;
+    border-color: white;
+    border-radius: 5px;
+    background-color: darkgreen;
+  }
+  
+  .players {
+   font: 20px Arial;
    font-weight: bold;
-   background-color: darkgreen;
-   overflow: hidden;
-   /* disabling content selection */
-   user-select: none; 
-   -moz-user-select: none; 
-   -khtml-user-select: none; 
-   -ms-user-select: none; 
-   -webkit-user-select: none;
-}
-
-#game {
-   margin: 20px;
-   overflow: hidden;
-}
-
-#header {
-   font-size: 32px;
-   color: red;
-   text-align: center;
-   text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
-}
-
-.players {
-   font-size: 20px;
    color: white;
    margin-top: 35px;
 }
 
 #info, #busted {
-   text-align: left;
-   margin-left: 55px;
+  text-align: left;
+  margin-left: 50px;
 }
 
 #points_cpu, #points_usr {
@@ -79,34 +141,70 @@ body {
    flex-direction: row;
    justify-content: space-between;
    margin-top: 50px;
+   margin-bottom: 3px;
+   margin-right: 3px;
 }
 
 .btn {
-   font-size: 18px;
+   font-size: 16px;
    color: white;
    font-weight: bold;
    border-color: white;
+   border: 1px solid;
    border-radius: 5px;
+   -webkit-box-shadow: 3px 3px #303030;
+   -moz-box-shadow: 3px 3px #303030;
    box-shadow: 3px 3px #303030;
    height: 35px;
 }
 
 #takeBtn {
-      background-color: green;
+    background-color: green;
 }
 
 #standBtn {
-      background-color: red;
+    background-color: red;
 }
 
 #newBtn {
-      background-color: black;
+     background-color: black;
 }
+
+#menu {
+    overflow: hidden;
+    height: 100%;
+ }
+  
+ #mBtn {
+     visibility:visible;
+ }
+
+ .redBtn {
+    background-color: red;
+ }
+
+ .menu_info {
+    margin-top: 15px;
+    width: 100%;
+ }
+
+ h3 {
+    font: 20px Arial;
+    font-weight: bold;
+ }
+
+ .content {
+    font: 16px Arial;
+    font-weight: bold;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    height: 100%; 
+ }
 
 </style>
 
 <script>
-	
+
    /*
      Black Jack - (17+4) 
      Copyright Rainer Wess 2018
@@ -126,12 +224,12 @@ body {
       var sum_cpu;
       var place_usr;
       var place_cpu;
-      var randNum;
       var running;
       var i;
       var ani;
       var intA;
       var intTC = [];
+      var deck = [];
       var card = [];
       var card_value = [];
       var revcard;
@@ -141,8 +239,6 @@ body {
 for (i = 0; i <= 51; i++) {
    card[i] = new Image();
    card[i].src = "cards/card" + i + ".png";
-   card[i].style.height = "80px";
-   card[i].style.width = "55px";
 }
 
 revcard = new Image();
@@ -175,12 +271,31 @@ function aniWin() {
 
    ani = (ani) ? false : true;
    if (ani) setColor("info", "darkgreen");
-   else setColor("info", "gold");
+   else setColor("info","gold");
 }
+ 
+   
+  function showMenu() {
+ id("menu").className="overlay_page";
+ id("guide").className="hidden_page";
+ id("about").className="hidden_page";
+  }
 
-function randomNumber(min, max) {
-   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+  function showGuide() { 
+id("guide").className="overlay_page";
+id("menu").className="hidden_page";
+  }
+
+  function showAbout() {
+id("about").className="overlay_page";
+id("menu").className="hidden_page";
+  }
+
+ function showGame() {
+  id("game").className="game_page";
+  id("menu").className="hidden_page";
+  
+ }
 
 function enableButtons() {
 
@@ -203,6 +318,53 @@ function init() {
    setText("points_cpu", points_cpu);
    newGame();
 }
+
+function createDeck() {
+
+      var arr = [];
+      for (var i = 0; i < 52; i++) {
+         arr[i] = i;
+      }
+      
+      return arr;
+}
+
+
+function shuffle(arr) {
+
+   var i, j, tmp; 
+
+   // Fisher-Yates Shuffling Algorithm
+
+   for(i=arr.length-1; i>0; i--) {
+    
+      j = Math.floor(Math.random() * (i + 1));
+      tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+      
+   }
+   
+   return arr;
+ }
+ 
+ 
+ function takeCard() {
+ 
+     var tc;
+     
+     if(deck.length == 0) {
+       deck = createDeck();
+       deck = shuffle(deck);     
+     }
+     
+     tc = deck.pop();        
+     
+     
+     return tc;
+     
+ }
+    
 
 function newGame() {
 
@@ -243,16 +405,18 @@ function showReversedCard() {
 
 function usrTakeCard() {
 
+   var cNum;
+
    id("takeBtn").blur();
 
    if (running) {
    
       if (sum_usr <= 21) {
          setText("info", " ");
-         randNum = randomNumber(0, 51);
-         setImg(place_usr, randNum);
+         cNum = takeCard();
+         setImg(place_usr, cNum);
          place_usr++;
-         sum_usr += card_value[randNum % 13];
+         sum_usr += card_value[cNum % 13];
          setText("you", sum_usr);
       }
       
@@ -268,14 +432,16 @@ function usrTakeCard() {
 
 function cpuTakeCard() {
 
+   var cNum;
+
    if (running) {
    
       if ((sum_cpu < 19 && sum_cpu < sum_usr) || (sum_cpu < 16 && sum_cpu == sum_usr)) {
 
-         randNum = randomNumber(0, 51);
-         setImg(place_cpu, randNum);
+         cNum = takeCard();
+         setImg(place_cpu, cNum);
          place_cpu++;
-         sum_cpu += card_value[randNum % 13];
+         sum_cpu += card_value[cNum % 13];
          setText("cpu", sum_cpu);
          
          if (place_cpu > 9) {
@@ -304,12 +470,12 @@ function stand() {
 
       for (i = 0; i < 4; i++) {
       
-         if (sum_usr > sum_cpu && sum_cpu < 19) {
+         if (sum_usr > sum_cpu && sum_cpu < 19 || sum_usr == sum_cpu && sum_cpu < 16) {
             intTC[i] = setTimeout(cpuTakeCard, wait);
             wait += 1000;
          }
       }
-   }
+   }      // Little Britain joke
    else setText("info", "💻 says NO!");
 }
 
@@ -383,12 +549,77 @@ function whoWins() {
 
 </head>
 
+
 <body onload="init()">
 
-   <div id="game">
-      <div id="header">Black Jack</div>
+  <div id="menu" class="hidden_page">
+     
+    <div class="header"><span class="game_title">Black Jack</span><button id="mBtn" class="MenuBtn" onclick="showGame()">&#10005;</button></div>
+    
+    <hr>
+    <div>
+      <button class="btn redBtn" onclick="showGuide()">How to play</button>
+    </div>
+    <div class="menu_info">
+      The rules of the card game Black Jack.
+      <p>
+    </div>
+    <hr>
+    <div>
+      <button class="btn redBtn" onclick="showAbout()">About the game</button>
+    </div>
+    <div class="menu_info">
+      Information about author, licence and copyright for this game.
+    </div>
+     <hr>
+    <div>
+      <button class="btn redBtn" onclick="showGame()">Back to game</button>
+    </div>
+    <div class="menu_info">
+      The menu button in the top right corner will you also bring back to the game.
+    </div>
+  </div>
 
-      <div class="players">CPU : <span id="cpu">0</span> <span id="busted"> </span><span id="points_cpu">0</span>
+  <div id="guide" class="hidden_page">
+    <div class="header"><span class="game_title">Black Jack</span><button class="MenuBtn" onclick="showMenu()">&#9776;</button></div>
+    
+    <div class="content">
+    <h3> How to play </h3>The purpose of the game is to win. 😀<br> You play here against a real pro, the Gina. <P>The goal of the game is to come closer to 21 points than your opponent, ideally to get exactly 21 points. But do not overdo it, because if a player passes 21 points, it is too much and he has lost. <p>Because the Gina plays so damn good, she has to turn a card over so that you can see it and estimate, if you already have enough points, or risk taking another card. <p>
+If you get exactly 21 points, you win immediately, which is of course the best, because then the Gina does not come into play. <P>
+Have fun playing!<p>
+    </div>
+  </div>
+
+  <div id="about" class="hidden_page">
+    <div class="header"><span class="game_title">Black Jack</span><button class="MenuBtn" onclick="showMenu()">&#9776;</button>
+    </div>
+
+    <div class="content">
+      <h3>About the Game</h3>
+      Game-Development / Programming:<br> 2018 ©️ Rainer Wess, Osnabr&uuml;ck
+      <p>
+      Made in Germany 🇩🇪
+          <p>
+            This game is open source / freeware. You can do with it whatever you want as long as this copyright and license disclaimer stays intact.
+            <p>
+              This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+              <p>
+                This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+                <p>
+                  You should have received a copy of the GNU General Public License along with this program.
+                  <p>
+                    If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>
+            
+         <p>
+            
+    </div>
+  </div>
+
+  <div id="game" class="game_page">
+    <div class="header"><span class="game_title">Black Jack</span><button class="MenuBtn" onclick="showMenu()">&#9776;</button>
+    </div>
+
+      <div class="players">GINA : <span id="cpu">0</span> <span id="busted"> </span><span id="points_cpu">0</span>
       </div>
 
       <div class="tables">
@@ -399,7 +630,7 @@ function whoWins() {
          <div class="places"><img id="place9" src="cards/nocard.png" alt=""></div>
       </div>
 
-      <div class="players">You : <span id="you">0</span> <span id="info"> </span><span id="points_usr">0</span></div>
+      <div class="players">YOU : <span id="you">0</span> <span id="info"> </span><span id="points_usr">0</span></div>
 
       <div class="tables">
          <div class="places"><img id="place0" src="cards/nocard.png" alt=""></div>
@@ -420,8 +651,9 @@ function whoWins() {
             <button id="newBtn" class="btn" onclick="newGame()">NEW GAME</button>
          </div>
       </div>
+      
+  </div>
 
-   </div>
-</body>
+  </body>
 
 </html>
