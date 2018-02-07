@@ -1,7 +1,13 @@
 # Black-Jack
 A simple Black Jack Game with JavaScript, CSS and HTML.
+Designed for touch devices like mobile or tablet.
 
-
-Screenshot:
-
-<img src="https://github.com/RainerWessOS/Black-Jack/blob/master/BlackJack.png" alt="Black Jack" />
+Screenshots: (english and german version)<p>
+Black Jack<p>
+<img src="https://github.com/RainerWessOS/Black-Jack/blob/master/BlackJack_EN.png" alt="Black Jack" />
+<img src="https://github.com/RainerWessOS/Black-Jack/blob/master/BlackJack_DE.png" alt="17 und 4" /><p>
+Magic Box Game:<p>
+<img src="https://github.com/RainerWessOS/Black-Jack/blob/master/MagicBoxGame_EN.png" alt="Magic Box Game" />
+<img src="https://github.com/RainerWessOS/Black-Jack/blob/master/MagicBoxGame_DE.png" alt="Black Jack" />
+  
+   
