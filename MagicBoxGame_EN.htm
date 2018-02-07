@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Magic Box Game</title>
+  <meta name="author" content="Rainer Wess" />
+  <meta name="description" content="Magic Box Game realised with JavaScript, HTML5 und CSS" />
+  <meta name="keywords" content="Spiel,Logik, Game, Logic, Puzzle, Touch, Handy App, mobile, open source, GPL, freeware, HTML,CSS, JavaScript" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+ 
+<style>
+
+  /* 
+   I have reduced the margins-height     
+   of some elements to look nicer on    
+   the Sololearn mobile App. To play 
+   it standlone you may stretch it a 
+   little bit in Y-direction.
+*/
+
+  body {
+    width: 360px;
+    margin: auto;
+    color: white;
+    font-family: Arial, Tahoma;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: darkgreen;
+
+    /* disabling content selection */
+    -webkit-user-select:none;
+
+    -khtml-user-select:none;
+
+    -moz-user-select:none;
+
+    -ms-user-select:none;
+
+    user-select:none;
+
+  }
+
+  hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  a {
+    color: Gold;
+  }
+  
+  .game_page {
+    position: absolute;
+    overflow: hidden;
+    top: 0px;
+    left: 0px;
+    width: 320px;
+    margin: 20px;
+    color: white;
+    background-color: darkgreen;
+  }
+
+  .overlay_page {
+    z-index: 5;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 320px;
+    margin: 20px;
+    color: white;
+    background-color: darkgreen;
+  }
+  
+ .hidden_page {
+    z-index: 5;
+    display: none;
+  }
+
+  .game_title {
+    font: 32px Arial;
+    font-weight: bold;
+    color: red;
+    text-align: left;
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+  }
+
+  .MenuBtn {
+    font: 22px Arial;
+    font-weight: bold;
+    color: DeepSkyBlue;
+    font-weight: bold;
+    float: right;
+    width: 35px;
+    height: 35px;
+    border: 1px solid;
+    border-color: white;
+    border-radius: 5px;
+    background-color: darkgreen;
+  }
+  
+  #game_stats {
+    font: 20px Arial;
+    font-weight: bold;
+    text-align:center;
+    color: white;
+    margin-top: 35px;
+    margin-bottom: 35px;
+  }
+  
+  span {
+    vertical-align: middle;
+  }
+  
+  .level {
+    float: left;
+    text-align: left;
+  }
+
+  #info {
+    margin-left: 1px;
+   }
+
+  .score {
+    float: right;
+    text-align: right;
+  }
+
+  .tables {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 310px;
+    margin-top: 15px;
+    margin-left: 2px;
+    margin-right: auto;
+    margin-bottom: 15px;
+  }
+
+  .boxes {
+    height: 65px;
+    width: 65px;
+    font: 48px Arial;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid;
+    border-color: white;
+    -webkit-box-shadow: 3px 3px 3px #303030;
+    -moz-box-shadow: 3px 3px 3px #303030;
+    box-shadow: 3px 3px 3px #303030;
+  }
+
+  #controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 50px;
+    margin-bottom: 3px;
+    margin-right: 3px;
+  }
+
+  .btn {
+    font: 16px Arial;
+    font-weight: bold;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border: 1px solid;
+    border-radius: 5px;
+    -webkit-box-shadow: 3px 3px #303030;
+    -moz-box-shadow: 3px 3px #303030;
+    box-shadow: 3px 3px #303030;
+    height: 35px;
+  }
+  
+  #newTryBtn {
+    background-color: green;
+  }
+
+  #hintBtn {
+    background-color: red;
+  }
+
+  #newGameBtn {
+    background-color: black;
+  }
+
+  #menu {
+    overflow: hidden;
+  }
+  
+  #mBtn {
+      visibility:hidden;
+  }
+
+  .redBtn {
+    background-color: red;
+  }
+
+  label {
+    font: 18px Arial;
+    font-weight: bold;
+  }
+  
+  #select_lvl {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+ #lvl {
+     margin-top: 3px; 
+     text-align:left;
+  }
+
+  #playBtn {
+      margin-left: 10px; 
+      margin-right: 5px; 
+  }
+
+  .menu_info {
+    margin-top: 15px;
+    width: 100%;
+  }
+
+  h3 {
+    font: 20px Arial;
+    font-weight: bold;
+  }
+
+  .content {
+    font: 16px Arial;
+    font-weight: bold;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    height: 100%;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 150px;
+    margin: 0;
+    margin-top: 12px; 
+    margin-bottom:5px;
+    vertical-align: middle; 
+    border: 0;
+    background: transparent;
+  }
+
+  input[type=range]:focus {
+    outline: none;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    margin-top: -11px;
+    border: 1px solid white;
+    border-radius: 5px;
+    box-shadow: 3px 3px #303030;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    background: red;
+  }
+
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 8px;
+    background: green;
+    cursor: pointer;
+  }
+
+  input[type=range]::-moz-range-thumb {
+    border: 1px solid white;
+    border-radius: 5px;
+    box-shadow: 3px 3px #303030;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    background: red;
+  }
+
+  input[type=range]::-moz-range-track {
+    height: 8px;
+    background: green;
+    cursor: pointer;
+  }
+
+  input[type=range]::-ms-thumb {
+    border: 1px solid white;
+    border-radius: 5px;
+    box-shadow: 3px 3px #303030;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    background: red;
+  }
+
+</style>
+
+<script>
+
+  /*
+       Magic Box Game  V0.85
+       Copyright Rainer Wess 2018
+       Made in Germany 🇩🇪
+       
+       Open Source / Freeware
+       Released under GNU GPL 3.0
+       You can download it from
+       github, search RainerWessOS
+     */
+
+  globals: {
+
+    var debug = false;
+
+    var score = 0;
+    var level = 0;
+    var num;
+    var num_boxes;
+    var magic_box = 0;
+    var box = [];
+    var numbers = [];
+    var colors = [];
+    var images = [];
+    var inv;
+    var ani = false;
+    var ready = false;
+  
+  }
+
+  // most of the following arrays  
+  // are for future additions
+
+  numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+
+  colors = ["Gold", "DarkOrange", "Green", "HotPink", "DeepSkyBlue", "Olive", "Salmon", "DarkOrchid", "SlateBlue", "OrangeRed", "DarkCyan", "SlateGray"];
+
+  images = ["💚", "🚢", "🚕", "🎾", "🌽️", "🐍", "👑", "🌞", "🌴", "🐧", "🐤", "☔"];
+  names = ["heart", "ship", "car", "tennis", "corn", "snake", "crown", "sun", "tree", "pinguin", "bird", "rain"];
+  
+  // useful little helper functions
+
+  function id(id) {
+    return document.getElementById(id);
+  }
+
+  function hide(hid) {
+    id(hid).style.visibility = "hidden";
+  }
+
+  function show(sid) {
+    id(sid).style.visibility = "visible";
+  }
+
+  function getVis(vid) {
+    return id(vid).style.visibility;
+  }
+
+  function setText(sid, txt) {
+    id(sid).innerHTML = txt;
+  }
+
+  function aniWin() {
+    ani = (ani) ? false : true;
+    if (ani) setColor("info", "darkgreen");
+    else setColor("info", "gold");
+  }
+
+  function setColor(sid, color) {
+    id(sid).style.color = color;
+  }
+
+  function setBgColor(sid, color) {
+    id(sid).style.backgroundColor = color;
+  }
+
+  function colorBox(num) {
+    setText(num, num);
+    setBgColor(num, colors[num]);
+  }
+
+  function imageBox(num) {
+    setBgColor(num, "white");
+    setText(num, images[num]);
+  }
+
+  function randNum(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  
+  function showMenu() {
+ id("menu").className="overlay_page";
+ if(level > 0) show("mBtn");
+ id("guide").className="hidden_page";
+ id("about").className="hidden_page";
+  }
+
+  function showGuide() { 
+id("guide").className="overlay_page";
+id("menu").className="hidden_page";
+  }
+
+  function showAbout() {
+id("about").className="overlay_page";
+id("menu").className="hidden_page";
+  }
+
+ function showGame() {
+  id("game").className="game_page";
+  id("menu").className="hidden_page";
+ }
+ 
+  function init() {
+    
+     ready = false; 
+            
+     for (var i=0; i<12; i++) {
+          colorBox(i);
+      // imageBox(i);
+          show(i);
+     }
+ }
+
+function startGame() {
+
+ ready = false; 
+
+ showGame();
+            
+ for (var i=0; i<12; i++) {
+    colorBox(i);
+ // imageBox(i);
+    show(i);
+ }
+  
+ level = id("level_selector").value;
+ setText("level", level);
+ level--;
+ 
+ newGame();
+
+}
+
+
+  function backToBeginning() {
+
+    id("newTryBtn").blur();
+
+    for (var i=0; i<num_boxes; i++) {
+      show(i);
+    }
+  }
+
+
+  function hint() {
+
+    id("hintBtn").blur();
+
+    alert("A little hint to make it a little bit easier. \n\nThe magic box is Number: " + magic_box );
+  }
+  
+  
+  function howManyBoxes() {
+
+    var nb;
+
+    if (level < 3) {
+      nb = 3;
+    }
+    else if (level < 5) {
+      nb = 4;
+    }
+    else if (level < 8) {
+      nb = randNum(4, 5);
+    }
+    else if (level < 12) {
+      nb = randNum(5, 6);
+    }
+    else if (level < 16) {
+      nb = randNum(6, 7);
+    }
+    else if (level < 21) {
+      nb = randNum(7, 8);
+    }
+    else if (level < 27) {
+      nb = randNum(8, 9);
+    }
+    else if (level < 35) {
+      nb = randNum(8, 10);
+    }
+    else if (level < 42) {
+      nb = randNum(9, 11);
+    }
+    else {
+      nb = randNum(9, 12);
+    }
+
+    return nb;
+  }
+
+
+  function createPath() {
+
+    var a, i;
+    var index = 0;
+    var item = 0;
+    var in_arr = [];
+    var out_arr = [];
+
+    for (i=0; i<num_boxes; i++) {
+      in_arr[i] = i;
+      out_arr[i] = num_boxes;
+    }
+
+    for (i=0; i<num_boxes; i++) {
+      do {
+        item =randNum(0,num_boxes-1);
+      }
+      while (item == index || out_arr.indexOf(item) !== -1)
+
+      out_arr[index] = item;
+      index = item;
+      
+    }
+
+    if (debug) {
+      console.log("After Pathcreation:");
+      console.log(out_arr);
+    }
+
+    /*
+     if Array to short, add impossibe 
+     value, will be corrected in next 
+     step; but dont ask me why the 
+     array is in rare cases to short 
+     or is missing values, if you 
+     know please write a comment!
+    */
+    
+    while(out_arr.length<num_boxes) {
+      out_arr.push(num_boxes);
+    }
+
+    // the missing numbers are put 
+    // in the right places
+    in_arr.forEach(function(item,i) {
+      if(out_arr.indexOf(item)==-1) {
+        a=out_arr.indexOf(num_boxes);
+        out_arr[a] = item;
+      }
+    });
+
+
+    if (debug) {
+      console.log("After Error-corection:");
+      console.log(out_arr);
+    }
+
+    /* 
+      we dont need this, but for 
+      3 boxes hardcoded randomness
+      is slightly better then random
+      randomness(only 2 possibilitys)
+    */
+    if (level == 1) {
+      out_arr = [1, 2, 0];
+    }
+    if (level == 2) {
+      out_arr = [2, 0, 1];
+    }
+
+    return out_arr;
+  }
+
+  function createMagicBox() {
+
+    var i;
+    var mb; // in random position
+
+    mb = randNum(0, num_boxes - 1);
+
+    // if a box closes itself, it 
+    // will not become a magic_box
+
+    for (i = 0; i < num_boxes; i++) {
+      if (box[i] == i) {
+        if (mb == i) {
+          mb++;
+          if (mb >= num_boxes) {
+            mb = 0;
+          }
+        }
+        break;
+      }
+    }
+    
+    return mb;
+
+  }
+
+
+  function showDifficulty() {
+
+    var i;
+    var diffy = false;
+
+    setColor("info", "white");
+    
+    if (num_boxes > 9) {
+      setText("info", "Hard")
+    }
+    else if (num_boxes > 6) {
+      setText("info", "Medium")
+    }
+    else {
+      setText("info", "Easy")
+    }
+
+  }
+
+  function hit(nr) {
+
+    var i, j;
+    var count = 0;
+
+    if (ready) {
+
+      // usual box
+      hide(box[nr]);
+      
+      // magic box
+      if (nr == magic_box) {
+        hide(magic_box);
+      }
+
+      checkWin();
+    }
+  }
+
+  function checkWin() {
+
+    var win = true;
+
+    for(var i=0; i<box.length; i++) {
+      if (getVis(i) == "visible") {
+        win = false;
+        break;
+      }
+    }
+    if (win) {
+      score += num_boxes;
+      setColor("info", "gold");
+      setText("info", "You Win!");
+      setText("score", score);
+     id("newTryBtn").disabled=true;
+     id("newGameBtn").disabled=false;
+      inv = setInterval(aniWin, 700);
+
+    }
+  }
+
+  function newGame() {
+
+    var i;
+
+    ready = false;
+    win = false;
+
+    if (inv) clearInterval(inv);
+    
+    level++;
+    
+    id("newGameBtn").blur();
+ setText("newGameBtn", "Next Level");
+    id("newGameBtn").disabled = true;
+    id("newTryBtn").disabled = false;
+    setText("info", " ");
+    setText("level", level);
+
+   
+
+    for (i = 0; i < 12; i++) {
+      hide(i);
+    }
+    
+    num_boxes = howManyBoxes();
+    
+    box = createPath();
+
+    magic_box = createMagicBox();
+
+    for (var i=0; i<num_boxes; i++) {
+      show(i);
+    }
+
+    showDifficulty();
+
+    ready = true;
+
+    if (debug) {
+      setText("info", "M-Box : " + magic_box);
+      console.log("The Boxarray:");
+      console.log(box);
+    }
+
+  }
+
+  // END
+
+</script>
+
+</head>
+
+<body onload="init()">
+
+  <div id="menu" class="hidden_page">
+    <div class="header"><span class="game_title">Magic Box Game</span><button id="mBtn" class="MenuBtn" onclick="showGame()">&#10005;</button></div>
+    <hr>
+    <div>
+      <button id="guideBtn" class="btn redBtn" onclick="showGuide()">How to play</button>
+    </div>
+    <div class="menu_info">
+      The rules and what you need to know to solve the levels.
+      <p>
+    </div>
+    <hr>
+    <div>
+      <label>Select a Level:</label>
+      <div id="select_lvl">
+          <input type="range" id="level_selector" value="1" min="1" max="31" step="5" list="datalist1" onchange="lvl.value = 'Level : ' + level_selector.value;">
+          <output id="lvl" for="level_selector">Level: 1</output>
+    <datalist id="datalist1">     
+       <option>1</option>
+       <option>6</option>                                                             
+       <option>11</option>
+       <option>16</option>
+       <option>21</option>
+       <option>26</option>
+       <option>31</option>
+   </datalist>
+          <button id="playBtn" class="btn redBtn" onclick="startGame()">PLAY</button>
+      </div>
+    </div>
+    <div class="menu_info">
+      If you have never played this game before just click "PLAY" to start with Level 1.
+      <p>
+    </div>
+    <hr>
+    <div>
+      <button id="aboutBtn" class="btn redBtn" onclick="showAbout()">About the Game</button>
+    </div>
+    <div class="menu_info">
+      Information about author, licence and copyright for this game.
+    </div>
+  </div>
+
+  <div id="guide" class="hidden_page">
+    <div class="header"><span class="game_title">Magic Box Game</span><button class="MenuBtn" onclick="showMenu()">&#9776;</button></div>
+    
+    <div class="content">
+      <h3>Instructions</h3>Magic Box is a combination of logic game and memory. What is needed is a clear mind and a good memory.
+      <P> The goal of the game is to win. 😀 <br> To reach this goal you have to make all boxes disappear. That sounds easier than it is. Here are the rules:
+        <p> Every box you click on will make one box disappear.
+          <P> There is a magic box that can not only make another box but also itself disappear.
+              <p>
+                To make all boxes disapear they have to be clicked in the correct order. Your task is now to find out this order by clicking on the boxes and worrying. If you click the boxes in the wrong order boxes are left and the game is not solvable, which is not a problem, because the "New try" button will take you back to the beginning of the level and then you can try again.
+                <p> Have fun puzzle!
+                  <p> Note: Coded a lot of randomness into the game. So everytime you play it the levels are different. Unlimited levels!
+                      <p>
+    </div>
+  </div>
+
+  <div id="about" class="hidden_page">
+    <div class="header"><span class="game_title">Magic Box Game</span><button class="MenuBtn" onclick="showMenu()">&#9776;</button>
+    </div>
+
+    <div class="content">
+      <h3>About the Game</h3>
+      Game-Development / Programming:<br> ©️ Rainer Wess - 2018
+      <p>
+        Made in Germany 🇩🇪
+        <p>
+          <p>
+            This game is open source / freeware. You can do with it whatever you want as long as this copyright and license disclaimer stays intact.
+            <p>
+              This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+              <p>
+                This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+                <p>
+                  You should have received a copy of the GNU General Public License along with this program.
+                  <p>
+                    If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>
+                    <p>
+    </div>
+  </div>
+
+  <div id="game" class="game_page">
+    <div class="header"><span class="game_title">Magic Box Game</span><button class="MenuBtn" onclick="showMenu()">&#9776;</button>
+    </div>
+
+    <div id="game_stats">
+      <span class="level">Level :&nbsp;</span>
+      <span class="level" id="level">0</span>
+      <span id="info">&nbsp;</span>
+            <span class="score" id="score">0</span>
+      <span class="score">Score :&nbsp;</span>
+
+    </div>
+
+    <div class="tables">
+      <div id="8" class="boxes" onclick="hit(8)"><span>8</span></div>
+      <div id="2" class="boxes" onclick="hit(2)"><span>2</span></div>
+      <div id="3" class="boxes" onclick="hit(3)"><span>3</span></div>
+      <div id="10" class="boxes" onclick="hit(10)"><span>10</span></div>
+    </div>
+
+    <div class="tables">
+      <div id="6" class="boxes" onclick="hit(6)"><span>6</span></div>
+      <div id="0" class="boxes" onclick="hit(0)"><span>0</span></div>
+      <div id="1" class="boxes" onclick="hit(1)"><span>1</span></div>
+      <div id="7" class="boxes" onclick="hit(7)"><span>7</span></div>
+    </div>
+
+    <div class="tables">
+      <div id="9" class="boxes" onclick="hit(9)"><span>9</span></div>
+      <div id="4" class="boxes" onclick="hit(4)"><span>4</span></div>
+      <div id="5" class="boxes" onclick="hit(5)"><span>5</span></div>
+      <div id="11" class="boxes" onclick="hit(11)"><span>11</span></div>
+    </div>
+
+    <div id="controls">
+      <div>
+        <button id="newTryBtn" class="btn" onclick="backToBeginning()">New Try</button>
+      </div>
+      <div>
+        <button id="hintBtn" class="btn" onclick="hint()">Need Hint</button>
+      </div>
+      <div>
+        <button id="newGameBtn" class="btn" onclick="newGame()">START GAME</button>
+      </div>
+    </div>
+  </div>
+
+  </body>
+
+</html>
