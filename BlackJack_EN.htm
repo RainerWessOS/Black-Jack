@@ -37,13 +37,9 @@
 
     /* disabling content selection */
     -webkit-user-select:none;
-
     -khtml-user-select:none;
-
     -moz-user-select:none;
-
     -ms-user-select:none;
-
     user-select:none;
 
   }
@@ -88,6 +84,7 @@
     font: 32px Arial;
     font-weight: bold;
     color: red;
+    line-height: 1.2;
     text-align: left;
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
   }
@@ -132,8 +129,8 @@
 }
 
 .places {
-   height: 81px;
-   width: 56px;
+   height: 82px;
+   width: 58px;
 }
 
 #controls {
@@ -214,6 +211,10 @@
      Released under GNU GPL 3.0
      You can download it from
      github, search RainerWessOS
+     
+     New in version 1.0:
+     Nice deck of cards created by 
+     nicubunu from openclipart.org
    */
 
    globals: {
@@ -254,9 +255,7 @@ function id(id) {
 }
 
 function setImg(pn, num) {
-
    id("place" + pn).src = card[num].src;
-   id("place" + pn).style.boxShadow = "1px 1px 1px #303030";
 }
 
 function setText(sid, txt) {
@@ -388,7 +387,6 @@ function newGame() {
 
    for (i = 0; i <= 9; i++) {
       id("place" + i).src = nocard.src;
-      id("place" + i).style.boxShadow = "none";
    }
 
    setTimeout(showReversedCard, 500);
@@ -398,9 +396,7 @@ function newGame() {
 }
 
 function showReversedCard() {
-
    id("place6").src = revcard.src;
-   id("place6").style.boxShadow = "1px 1px 1px #303030";
 }
 
 function usrTakeCard() {
@@ -613,6 +609,8 @@ Have fun playing!<p>
                     You can download the latest version of this game from github.com:<br>
 <a href="https://github.com/RainerWessOS/Black-Jack">https://github.com/RainerWessOS/Black-Jack</a>
          <p>
+         The grafics for the nice deck of cards were created by nicubunu and are realeased under Creative Commons Zero 1.0 Public Domain License. I have them from openclipart.org
+            <p>
             
     </div>
   </div>
